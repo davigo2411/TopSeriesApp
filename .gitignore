@@ -1,0 +1,25 @@
+# Archivos y carpetas de configuración de IDE
+*.iml
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos generados por Gradle
+.gradle/
+build/
+app/build/
+externalNativeBuild/
+cxx/
+captures/
+local.properties
+
+# Archivos de caché y binarios
+*.class
+*.apk
+*.dex
+
+# Archivos sensibles
+*.keystore
+
+# Otros
+*.log
