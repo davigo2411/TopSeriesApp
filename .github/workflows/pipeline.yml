@@ -29,11 +29,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle
+
       - name: Dar permisos de ejecución al gradle wrapper
         run: chmod +x ./gradlew
 
       - name: Build de la app
-        run: ./gradlew build
+        run: ./gradlew assembleDebug --parallel --configure-on-demand
 
       - name: SonarQube Scan
         env:
