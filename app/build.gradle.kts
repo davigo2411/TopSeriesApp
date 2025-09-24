@@ -12,6 +12,10 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
 
     defaultConfig {
@@ -47,9 +51,6 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
@@ -64,6 +65,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.koin.android)
     implementation(libs.koin.core)
+    implementation(libs.coil.kt.coil.compose)
 
 
     // Retrofit & OkHttp
@@ -84,4 +86,5 @@ dependencies {
     // Dependencias para debug
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
 }

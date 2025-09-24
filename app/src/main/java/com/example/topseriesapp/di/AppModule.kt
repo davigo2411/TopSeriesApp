@@ -10,8 +10,9 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import org.koin.core.qualifier.named
 import com.example.topseriesapp.domain.usecase.GetPopularTvShowsUseCase
+import com.example.topseriesapp.ui.popularshows.PopularTvShowsViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 
 private const val BASE_URL = "https://api.themoviedb.org/3/"
 
@@ -19,18 +20,20 @@ val appModule = module {
 
     // Definición para OkHttpClient
     single {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
+        HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
+    }
+    single {
         OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            .addInterceptor(get<HttpLoggingInterceptor>())
             .build()
     }
 
     single {
         Retrofit.Builder()
             .baseUrl(BASE_URL) // Establece la URL base para todas las llamadas de esta instancia de Retrofit
-            .client(get())
+            .client(get<OkHttpClient>())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -46,16 +49,22 @@ val appModule = module {
     single<TvShowRepository>{
         TvShowRepositoryImpl(
             tmdbApiService = get(),
-            dispatchers = get(named("IODispacther"))
+            dispatchers = get()
         )
     }
 
     // Definición del Caso de Uso
     factory {
-        GetPopularTvShowsUseCase(get()) // Koin inyecta TvShowRepository
+        GetPopularTvShowsUseCase(get())
     }
 }
 
-val viewModelModule = module {
 
+val viewModelModule = module {
+    viewModel {
+        PopularTvShowsViewModel(getPopularTvShowsUseCase = get())
+    }
 }
+
+// Lista de todos tus módulos para Koin
+val allAppModules = listOf(appModule, viewModelModule)

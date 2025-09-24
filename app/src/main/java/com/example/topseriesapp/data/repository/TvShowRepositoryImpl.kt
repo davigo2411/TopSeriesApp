@@ -17,20 +17,19 @@ class TvShowRepositoryImpl(
         return withContext(dispatchers.io) {
             try {
                 val response = tmdbApiService.getPopularTvShows(
-                    apiKey = BuildConfig.TMDB_API_KEY, // Asumiendo que tu API service lo necesita aquí
+                    apiKey = BuildConfig.TMDB_API_KEY,
                     page = page
                 )
 
                 if (response.isSuccessful) {
-                    val fullTvShowResponse = response.body() // <--- Obtén el objeto TvShowResponse completo
+                    val fullTvShowResponse = response.body()
                     if (fullTvShowResponse != null) {
-                        // CORRECCIÓN: Envuelve el TvShowResponse completo en Success
                         NetworkResponse.Success(fullTvShowResponse)
                     } else {
-                        // Esto podría indicar un problema si la respuesta fue 2xx pero el cuerpo es null
                         NetworkResponse.Error("La respuesta de la API está vacía pero fue exitosa (código ${response.code()}).")
                     }
                 } else {
+                    response.errorBody()?.string()
                     NetworkResponse.Error("Error de API: ${response.code()} ${response.message()}")
                 }
             } catch (e: IOException) {

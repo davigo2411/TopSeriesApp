@@ -19,7 +19,7 @@ class GetPopularTvShowsUseCase(
                             totalPages = nonNullData.totalPages
                         )
                     )
-                } ?: NetworkResponse.Error("Los datos recibidos del servidor son nulos en una respuesta exitosa.") // <--- CORREGIDO
+                } ?: NetworkResponse.Error("Los datos recibidos del servidor son nulos en una respuesta exitosa.")
             }
             is NetworkResponse.Error -> {
                 NetworkResponse.Error(repoResponse.message ?: "Error desconocido en la respuesta del repositorio")

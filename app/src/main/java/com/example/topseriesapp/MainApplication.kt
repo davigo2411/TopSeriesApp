@@ -1,8 +1,7 @@
 package com.example.topseriesapp
 
 import android.app.Application
-import com.example.topseriesapp.di.appModule
-import com.example.topseriesapp.di.viewModelModule
+import com.example.topseriesapp.di.allAppModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -15,7 +14,7 @@ class MainApplication : Application() {
         startKoin {
             androidContext(this@MainApplication)
             androidLogger(Level.DEBUG)
-            modules(appModule, viewModelModule)
+            modules(allAppModules)
         }
     }
 }

@@ -25,7 +25,7 @@ data class PopularTvShowsUiState(
 class PopularTvShowsViewModel(
     private val getPopularTvShowsUseCase: GetPopularTvShowsUseCase
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(PopularTvShowsUiState(isLoading = true)) // Inicialmente cargando
+    private val _uiState = MutableStateFlow(PopularTvShowsUiState(isLoading = false)) // Inicialmente cargando
     val uiState: StateFlow<PopularTvShowsUiState> = _uiState.asStateFlow()
 
     init{

@@ -7,7 +7,7 @@ interface CoroutineDispatchers {
     val main: CoroutineDispatcher
     val default: CoroutineDispatcher
     val io: CoroutineDispatcher
-    val unconfined: CoroutineDispatcher // Si la necesitas
+    val unconfined: CoroutineDispatcher
 }
 
 class DefaultCoroutineDispatchers : CoroutineDispatchers {
