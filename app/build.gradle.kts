@@ -10,6 +10,10 @@ android {
     namespace = "com.example.topseriesapp"
     compileSdk = 36
 
+    buildFeatures { // <--- AÑADE ESTE BLOQUE
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.example.topseriesapp"
         minSdk = 24
@@ -25,8 +29,7 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
 
-        buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("TMDB_API_KEY") ?: ""}\"")
-    }
+        buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY") ?: "\"\"")    }
 
     buildTypes {
         release {
@@ -66,7 +69,7 @@ dependencies {
     // Retrofit & OkHttp
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation(libs.okhttp) 
+    implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
 
     // Dependencias de test
