@@ -11,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import org.koin.core.qualifier.named
+import com.example.topseriesapp.domain.usecase.GetPopularTvShowsUseCase
 
 private const val BASE_URL = "https://api.themoviedb.org/3/"
 
@@ -47,6 +48,11 @@ val appModule = module {
             tmdbApiService = get(),
             dispatchers = get(named("IODispacther"))
         )
+    }
+
+    // Definición del Caso de Uso
+    factory {
+        GetPopularTvShowsUseCase(get()) // Koin inyecta TvShowRepository
     }
 }
 
