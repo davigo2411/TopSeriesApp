@@ -10,7 +10,7 @@ android {
     namespace = "com.example.topseriesapp"
     compileSdk = 36
 
-    buildFeatures { // <--- AÑADE ESTE BLOQUE
+    buildFeatures {
         buildConfig = true
     }
 

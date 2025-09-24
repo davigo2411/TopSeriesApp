@@ -6,10 +6,10 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TMDBApiService {
-    //GET top rated TV shows
+    //GET popular TV shows
     @GET("tv/popular")
-    suspend fun getTopPopularTvShows(
-        // Returns a list of TV shows
+    suspend fun getPopularTvShows(
+        // Devuelve una lista de TvShows
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1

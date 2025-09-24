@@ -1,11 +1,16 @@
 package com.example.topseriesapp.di
 
+import com.example.topseriesapp.coroutines.CoroutineDispatchers
+import com.example.topseriesapp.coroutines.DefaultCoroutineDispatchers
 import com.example.topseriesapp.data.network.TMDBApiService
+import com.example.topseriesapp.data.repository.TvShowRepository
+import com.example.topseriesapp.data.repository.TvShowRepositoryImpl
 import org.koin.dsl.module
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import org.koin.core.qualifier.named
 
 private const val BASE_URL = "https://api.themoviedb.org/3/"
 
@@ -33,9 +38,18 @@ val appModule = module {
     single{
         get<Retrofit>().create(TMDBApiService::class.java)
     }
-    // Más definiciones vendrán aquí...
+
+
+    single<CoroutineDispatchers> {DefaultCoroutineDispatchers() }
+
+    single<TvShowRepository>{
+        TvShowRepositoryImpl(
+            tmdbApiService = get(),
+            dispatchers = get(named("IODispacther"))
+        )
+    }
 }
 
 val viewModelModule = module {
-    // Aquí definiremos nuestros ViewModels
+
 }
