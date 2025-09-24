@@ -1,8 +1,8 @@
 package com.example.topseriesapp
 
 import android.app.Application
-import com.example.topseriesapp.di.appModule // Asegúrate que la ruta sea correcta
-import com.example.topseriesapp.di.viewModelModule // Asegúrate que la ruta sea correcta
+import com.example.topseriesapp.di.appModule
+import com.example.topseriesapp.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -13,11 +13,8 @@ class MainApplication : Application() {
         super.onCreate()
 
         startKoin {
-            // Usar el contexto de Android
             androidContext(this@MainApplication)
-            // Habilitar el logger de Koin (opcional)
             androidLogger(Level.DEBUG)
-            // Cargar los módulos de Koin
             modules(appModule, viewModelModule)
         }
     }

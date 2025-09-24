@@ -1,13 +1,13 @@
 package com.example.topseriesapp.di
 
-
+import com.example.topseriesapp.data.network.TMDBApiService
 import org.koin.dsl.module
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val BASE_URL = "https://api.themoviedb.org/3/" // <--- Añade tu URL base aquí
+private const val BASE_URL = "https://api.themoviedb.org/3/"
 
 val appModule = module {
 
@@ -29,6 +29,10 @@ val appModule = module {
             .build()
     }
 
+    //Definición para TMBDApiService
+    single{
+        get<Retrofit>().create(TMDBApiService::class.java)
+    }
     // Más definiciones vendrán aquí...
 }
 
