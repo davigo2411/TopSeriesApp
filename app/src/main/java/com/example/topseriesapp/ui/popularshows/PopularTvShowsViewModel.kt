@@ -25,11 +25,11 @@ data class PopularTvShowsUiState(
 class PopularTvShowsViewModel(
     private val getPopularTvShowsUseCase: GetPopularTvShowsUseCase
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(PopularTvShowsUiState(isLoading = false)) // Inicialmente cargando
+    private val _uiState = MutableStateFlow(PopularTvShowsUiState(isLoading = false))
     val uiState: StateFlow<PopularTvShowsUiState> = _uiState.asStateFlow()
 
-    init{
-        loadPopularTvShows(pageToLoad = 1) // Carga la primera página
+    init {
+        loadPopularTvShows(pageToLoad = 1)
     }
 
     private fun loadPopularTvShows(pageToLoad: Int) {
@@ -44,13 +44,28 @@ class PopularTvShowsViewModel(
                 is NetworkResponse.Success -> {
                     val result = response.data
                     if (result != null) {
+
                         _uiState.update { currentState ->
+
+                            val combinedShows = if (result.currentPage == 1) {
+                                result.tvShows
+                            } else {
+                                currentState.tvShows + result.tvShows
+                            }
+
+                            // Filtrar duplicados por ID
+                            val uniqueShows = combinedShows.distinctBy { it.id }
+
                             currentState.copy(
                                 isLoading = false,
-                                tvShows = if (result.currentPage == 1) result.tvShows else currentState.tvShows + result.tvShows,
+                                tvShows = uniqueShows,
                                 currentPage = result.currentPage,
                                 totalPages = result.totalPages
                             )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(isLoading = false, error = "Respuesta exitosa pero sin datos.")
                         }
                     }
                 }
@@ -63,11 +78,16 @@ class PopularTvShowsViewModel(
         }
     }
 
-    // Llama a esta función para cargar la siguiente página
     fun loadNextPage() {
         if (_uiState.value.canLoadMore && !_uiState.value.isLoading) {
             val nextPage = _uiState.value.currentPage + 1
             loadPopularTvShows(pageToLoad = nextPage)
         }
     }
+
+    fun retryInitialLoad() {
+        _uiState.update { it.copy(tvShows = emptyList(), currentPage = 0, totalPages = 0, error = null) }
+        loadPopularTvShows(pageToLoad = 1)
+    }
 }
+

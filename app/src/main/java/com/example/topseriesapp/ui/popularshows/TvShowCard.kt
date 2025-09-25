@@ -66,7 +66,8 @@ fun TvShowCard(
                     text = tvShow.firstAirDate?.take(4) ?: "N/A",
                     style = MaterialTheme.typography.bodySmall
                 )
-                // Se puede agregar más información aquí
+
+                // Añadir más detalles si es necesario
             }
         }
     }

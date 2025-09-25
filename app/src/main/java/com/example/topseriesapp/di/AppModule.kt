@@ -32,7 +32,7 @@ val appModule = module {
 
     single {
         Retrofit.Builder()
-            .baseUrl(BASE_URL) // Establece la URL base para todas las llamadas de esta instancia de Retrofit
+            .baseUrl(BASE_URL)
             .client(get<OkHttpClient>())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -66,5 +66,5 @@ val viewModelModule = module {
     }
 }
 
-// Lista de todos tus módulos para Koin
+// Lista de todos los modulos de la aplicación
 val allAppModules = listOf(appModule, viewModelModule)
