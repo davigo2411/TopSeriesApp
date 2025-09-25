@@ -28,9 +28,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag // Asegúrate de tener este import
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.topseriesapp.data.model.TvShow
+import com.example.topseriesapp.data.model.TvShow // O tu paquete correcto para TvShow
+// Asume que PopularTvShowsUiState y PopularTvShowsViewModel están disponibles/importados
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,9 +42,10 @@ fun PopularTvShowsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
+        modifier = Modifier.testTag("popularTvShowsScreen_scaffold"), // Tag para el Scaffold
         topBar = {
             TopAppBar(
-                title = { Text("Series Populares") },
+                title = { Text("Popular Tv shows") }, // El texto se puede buscar directamente
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -58,25 +61,34 @@ fun PopularTvShowsScreen(
             when {
                 uiState.isLoading && uiState.tvShows.isEmpty() -> { // Carga inicial
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(modifier = Modifier.testTag("initialLoadingIndicator"))
                     }
                 }
 
                 uiState.error != null && uiState.tvShows.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Error: ${uiState.error}")
+                            Text(
+                                text = "Error: ${uiState.error}",
+                                modifier = Modifier.testTag("initialErrorMessage")
+                            )
                             Spacer(Modifier.height(8.dp))
-                            Button(onClick = { viewModel.retryInitialLoad() }) {
+                            Button(
+                                onClick = { viewModel.retryInitialLoad() },
+                                modifier = Modifier.testTag("initialRetryButton")
+                            ) {
                                 Text("Reintentar")
                             }
                         }
                     }
                 }
 
-                uiState.tvShows.isEmpty() -> {
+                uiState.tvShows.isEmpty() -> { // Estado vacío después de carga, sin error
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay series populares para mostrar.")
+                        Text(
+                            text = "No hay series populares para mostrar.",
+                            modifier = Modifier.testTag("emptyStateText")
+                        )
                     }
                 }
 
@@ -86,25 +98,29 @@ fun PopularTvShowsScreen(
                         onLoadMore = { viewModel.loadNextPage() },
                         onItemClick = { tvShow ->
                             println("Clicked on: ${tvShow.name}")
-                        }
+                            // Aquí manejarías la navegación en la app real
+                        },
+                        // Pasamos un modifier con testTag si es necesario para el contenedor de la lista
+                        modifier = Modifier.testTag("popularTvShowList_container")
                     )
                 }
             }
         }
     }
 }
+
 @Composable
 fun PopularTvShowList(
     uiState: PopularTvShowsUiState,
     onLoadMore: () -> Unit,
     onItemClick: (TvShow) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier // Recibe el modifier del llamador
 ) {
     val listState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().testTag("tvShowLazyList"), // Aplicar testTag a LazyColumn
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -112,36 +128,50 @@ fun PopularTvShowList(
             items = uiState.tvShows,
             key = { _, tvShow -> tvShow.id }
         ) { _, tvShow ->
+            // Asumiendo que TvShowCard es un Composable tuyo.
+            // Es bueno si TvShowCard internamente tiene elementos con testTag
+            // o si TvShowCard mismo tiene un testTag más específico si es necesario.
+            // Para encontrar items individuales, buscar por texto (nombre de la serie)
+            // o un testTag dinámico en TvShowCard es una buena estrategia.
             TvShowCard(
                 tvShow = tvShow,
                 onItemClick = onItemClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().testTag("tvShowItem_${tvShow.id}") // Tag dinámico por item
             )
         }
 
-        // Mostrar indicador de carga o error al final de la lista
-        if (uiState.isLoading) {
+        // Mostrar indicador de carga o error al final de la lista para paginación
+        if (uiState.isLoading) { // Asumo que isLoading se usa para carga de "más" cuando ya hay items
             item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = 16.dp)
+                        .testTag("loadMoreIndicatorContainer"), // Tag para el contenedor del indicador
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(modifier = Modifier.testTag("loadMoreIndicator"))
                 }
             }
-        } else if (uiState.error != null && uiState.canLoadMore) {
+        } else if (uiState.error != null && uiState.canLoadMore) { // Error específico de paginación
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(16.dp)
+                        .testTag("loadMoreErrorContainer"), // Tag para el contenedor del error de paginación
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Error al cargar más: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = "Error al cargar más: ${uiState.error}",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.testTag("loadMoreErrorMessage")
+                    )
                     Spacer(Modifier.height(8.dp))
-                    Button(onClick = onLoadMore) {
+                    Button(
+                        onClick = onLoadMore, // Debería ser viewModel.retryLoadMore() o similar si tienes lógica separada
+                        modifier = Modifier.testTag("loadMoreRetryButton")
+                    ) {
                         Text("Reintentar")
                     }
                 }
@@ -158,7 +188,6 @@ fun PopularTvShowList(
                 false
             } else {
                 val lastVisibleItem = visibleItemsInfo.lastOrNull()
-                // Detecta el último item visible y si no se puede scrollear más
                 lastVisibleItem != null && lastVisibleItem.index == layoutInfo.totalItemsCount - 1 &&
                         !listState.canScrollForward
             }
@@ -171,3 +200,4 @@ fun PopularTvShowList(
         }
     }
 }
+
