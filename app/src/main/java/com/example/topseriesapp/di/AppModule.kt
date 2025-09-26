@@ -13,6 +13,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.example.topseriesapp.domain.usecase.GetPopularTvShowsUseCase
 import com.example.topseriesapp.ui.popularshows.PopularTvShowsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
+import androidx.lifecycle.SavedStateHandle
+import com.example.topseriesapp.domain.usecase.GetTvShowDetailsUseCase
+import com.example.topseriesapp.domain.usecase.GetTvShowDetailsUseCaseImpl
+import com.example.topseriesapp.ui.showsdetails.TvShowDetailsViewModel
 
 private const val BASE_URL = "https://api.themoviedb.org/3/"
 
@@ -53,9 +57,13 @@ val appModule = module {
         )
     }
 
-    // Definición del Caso de Uso
+    // Definición de los Casos de Uso
     factory {
         GetPopularTvShowsUseCase(get())
+    }
+
+    factory<GetTvShowDetailsUseCase> {
+        GetTvShowDetailsUseCaseImpl(get())
     }
 }
 
@@ -63,6 +71,13 @@ val appModule = module {
 val viewModelModule = module {
     viewModel {
         PopularTvShowsViewModel(getPopularTvShowsUseCase = get())
+    }
+
+    viewModel { (handle: SavedStateHandle) ->
+        TvShowDetailsViewModel(
+            getTvShowDetailsUseCase = get(),
+            savedStateHandle = handle
+        )
     }
 }
 

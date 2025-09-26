@@ -22,6 +22,6 @@ interface TMDBApiService {
     suspend fun getTvShowDetails(
         @Path("series_id") seriesId: Int,
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "es-ES"
+        @Query("language") language: String = "en-US"
     ): Response<TvShowDetails>
 }

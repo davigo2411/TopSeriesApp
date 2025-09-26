@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+    implementation(libs.androidx.navigation.runtime.android)
 
     // Dependencias de test
     testImplementation(libs.junit)
@@ -99,6 +100,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation (libs.mockk.android)
+    implementation(libs.koin.androidx.compose)
 
     // Dependencias para debug
     debugImplementation(libs.androidx.ui.tooling)
@@ -115,6 +117,10 @@ dependencies {
         exclude(group = "org.junit.jupiter")
         exclude(group = "org.junit.platform")
     }
+
+    //JetPack Compose Navigation
+    implementation(libs.androidx.navigation.compose)
+
 
 
 }

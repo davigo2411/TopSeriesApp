@@ -33,10 +33,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.topseriesapp.data.model.TvShow
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PopularTvShowsScreen(
-    viewModel: PopularTvShowsViewModel
+    viewModel: PopularTvShowsViewModel,
+    onNavigateToDetails: (seriesId: Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -44,7 +46,7 @@ fun PopularTvShowsScreen(
         modifier = Modifier.testTag("popularTvShowsScreen_scaffold"),
         topBar = {
             TopAppBar(
-                title = { Text("Popular Tv shows") },
+                title = { Text("Popular TV Shows") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -58,7 +60,7 @@ fun PopularTvShowsScreen(
                 .padding(paddingValues),
         ) {
             when {
-                uiState.isLoading && uiState.tvShows.isEmpty() -> { // Carga inicial
+                uiState.isLoading && uiState.tvShows.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(modifier = Modifier.testTag("initialLoadingIndicator"))
                     }
@@ -76,27 +78,27 @@ fun PopularTvShowsScreen(
                                 onClick = { viewModel.retryInitialLoad() },
                                 modifier = Modifier.testTag("initialRetryButton")
                             ) {
-                                Text("Reintentar")
+                                Text("Retry")
                             }
                         }
                     }
                 }
 
-                uiState.tvShows.isEmpty() -> { // Estado vacío después de carga, sin error
+                uiState.tvShows.isEmpty()  -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "No hay series populares para mostrar.",
+                            text = "No popular TV shows to display.",
                             modifier = Modifier.testTag("emptyStateText")
                         )
                     }
                 }
 
-                else -> { // Mostrar la lista de series
+                else -> {
                     PopularTvShowList(
                         uiState = uiState,
                         onLoadMore = { viewModel.loadNextPage() },
                         onItemClick = { tvShow ->
-                            println("Clicked on: ${tvShow.name}")
+                            onNavigateToDetails(tvShow.id)
                         },
                         modifier = Modifier.testTag("popularTvShowList_container")
                     )
@@ -132,8 +134,7 @@ fun PopularTvShowList(
             )
         }
 
-        // Mostrar indicador de carga o error al final de la lista para paginación
-        if (uiState.isLoading) {
+        if (uiState.isLoading && uiState.tvShows.isNotEmpty()) {
             item {
                 Row(
                     modifier = Modifier
@@ -145,7 +146,7 @@ fun PopularTvShowList(
                     CircularProgressIndicator(modifier = Modifier.testTag("loadMoreIndicator"))
                 }
             }
-        } else if (uiState.error != null && uiState.canLoadMore) {
+        } else if (uiState.error != null && uiState.canLoadMore && uiState.tvShows.isNotEmpty()) {
             item {
                 Column(
                     modifier = Modifier
@@ -155,7 +156,7 @@ fun PopularTvShowList(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Error al cargar más: ${uiState.error}",
+                        text = "Error loading more: ${uiState.error}",
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.testTag("loadMoreErrorMessage")
                     )
@@ -164,19 +165,18 @@ fun PopularTvShowList(
                         onClick = onLoadMore,
                         modifier = Modifier.testTag("loadMoreRetryButton")
                     ) {
-                        Text("Reintentar")
+                        Text("Retry")
                     }
                 }
             }
         }
     }
 
-    //Detectar el scroll al final de la lista
     val isScrolledToEnd by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
             val visibleItemsInfo = layoutInfo.visibleItemsInfo
-            if (layoutInfo.totalItemsCount == 0) {
+            if (layoutInfo.totalItemsCount == 0 || uiState.tvShows.isEmpty()) {
                 false
             } else {
                 val lastVisibleItem = visibleItemsInfo.lastOrNull()
@@ -187,9 +187,8 @@ fun PopularTvShowList(
     }
 
     LaunchedEffect(isScrolledToEnd, uiState.canLoadMore, uiState.isLoading) {
-        if (isScrolledToEnd && uiState.canLoadMore && !uiState.isLoading) {
+        if (isScrolledToEnd && uiState.canLoadMore && !uiState.isLoading && uiState.tvShows.isNotEmpty()) {
             onLoadMore()
         }
     }
 }
-
