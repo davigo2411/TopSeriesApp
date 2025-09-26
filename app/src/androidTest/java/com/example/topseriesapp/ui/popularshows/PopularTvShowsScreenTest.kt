@@ -265,7 +265,6 @@ class PopularTvShowsScreenTest {
             .onNodeWithTag("tvShowItem_1")
             .performClick()
 
-        // En una implementación real, aquí verificarías la navegación
         // Por ahora solo verificamos que el elemento es clickeable
         composeTestRule
             .onNodeWithTag("tvShowItem_1")
@@ -290,7 +289,7 @@ class PopularTvShowsScreenTest {
             }
         }
 
-        // Then - Verificar elementos por texto (más confiable que testTags específicos)
+        // Then - Verificar elementos por texto
         composeTestRule
             .onNodeWithText("Breaking Bad")
             .assertIsDisplayed()
@@ -310,7 +309,6 @@ class PopularTvShowsScreenTest {
             .performClick()
     }
 
-    // Helper function para crear mock del ViewModel
     private fun createMockViewModel(uiState: PopularTvShowsUiState): PopularTvShowsViewModel {
         val mockViewModel = mockk<PopularTvShowsViewModel>(relaxed = true)
         val stateFlow = MutableStateFlow(uiState)

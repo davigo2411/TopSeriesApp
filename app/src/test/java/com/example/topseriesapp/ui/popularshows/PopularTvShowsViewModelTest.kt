@@ -153,7 +153,7 @@ class PopularTvShowsViewModelTest {
         // Then
         val finalState = viewModel.uiState.first()
         assertFalse(finalState.isLoading)
-        assertEquals(2, finalState.tvShows.size) // 1 + 1 serie
+        assertEquals(2, finalState.tvShows.size)
         assertEquals(mockTvShow1, finalState.tvShows[0])
         assertEquals(mockTvShow2, finalState.tvShows[1])
         assertEquals(2, finalState.currentPage)
@@ -213,7 +213,7 @@ class PopularTvShowsViewModelTest {
 
         // Then
         val state = viewModel.uiState.first()
-        assertFalse(state.canLoadMore) // No debería poder cargar más
+        assertFalse(state.canLoadMore)
         assertEquals(5, state.currentPage)
         assertEquals(5, state.totalPages)
     }

@@ -28,11 +28,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag // Asegúrate de tener este import
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.topseriesapp.data.model.TvShow // O tu paquete correcto para TvShow
-// Asume que PopularTvShowsUiState y PopularTvShowsViewModel están disponibles/importados
+import com.example.topseriesapp.data.model.TvShow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,10 +41,10 @@ fun PopularTvShowsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = Modifier.testTag("popularTvShowsScreen_scaffold"), // Tag para el Scaffold
+        modifier = Modifier.testTag("popularTvShowsScreen_scaffold"),
         topBar = {
             TopAppBar(
-                title = { Text("Popular Tv shows") }, // El texto se puede buscar directamente
+                title = { Text("Popular Tv shows") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -98,9 +97,7 @@ fun PopularTvShowsScreen(
                         onLoadMore = { viewModel.loadNextPage() },
                         onItemClick = { tvShow ->
                             println("Clicked on: ${tvShow.name}")
-                            // Aquí manejarías la navegación en la app real
                         },
-                        // Pasamos un modifier con testTag si es necesario para el contenedor de la lista
                         modifier = Modifier.testTag("popularTvShowList_container")
                     )
                 }
@@ -114,13 +111,13 @@ fun PopularTvShowList(
     uiState: PopularTvShowsUiState,
     onLoadMore: () -> Unit,
     onItemClick: (TvShow) -> Unit,
-    modifier: Modifier = Modifier // Recibe el modifier del llamador
+    modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
     LazyColumn(
         state = listState,
-        modifier = modifier.fillMaxSize().testTag("tvShowLazyList"), // Aplicar testTag a LazyColumn
+        modifier = modifier.fillMaxSize().testTag("tvShowLazyList"),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -128,38 +125,33 @@ fun PopularTvShowList(
             items = uiState.tvShows,
             key = { _, tvShow -> tvShow.id }
         ) { _, tvShow ->
-            // Asumiendo que TvShowCard es un Composable tuyo.
-            // Es bueno si TvShowCard internamente tiene elementos con testTag
-            // o si TvShowCard mismo tiene un testTag más específico si es necesario.
-            // Para encontrar items individuales, buscar por texto (nombre de la serie)
-            // o un testTag dinámico en TvShowCard es una buena estrategia.
             TvShowCard(
                 tvShow = tvShow,
                 onItemClick = onItemClick,
-                modifier = Modifier.fillMaxWidth().testTag("tvShowItem_${tvShow.id}") // Tag dinámico por item
+                modifier = Modifier.fillMaxWidth().testTag("tvShowItem_${tvShow.id}")
             )
         }
 
         // Mostrar indicador de carga o error al final de la lista para paginación
-        if (uiState.isLoading) { // Asumo que isLoading se usa para carga de "más" cuando ya hay items
+        if (uiState.isLoading) {
             item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
-                        .testTag("loadMoreIndicatorContainer"), // Tag para el contenedor del indicador
+                        .testTag("loadMoreIndicatorContainer"),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     CircularProgressIndicator(modifier = Modifier.testTag("loadMoreIndicator"))
                 }
             }
-        } else if (uiState.error != null && uiState.canLoadMore) { // Error específico de paginación
+        } else if (uiState.error != null && uiState.canLoadMore) {
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .testTag("loadMoreErrorContainer"), // Tag para el contenedor del error de paginación
+                        .testTag("loadMoreErrorContainer"),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -169,7 +161,7 @@ fun PopularTvShowList(
                     )
                     Spacer(Modifier.height(8.dp))
                     Button(
-                        onClick = onLoadMore, // Debería ser viewModel.retryLoadMore() o similar si tienes lógica separada
+                        onClick = onLoadMore,
                         modifier = Modifier.testTag("loadMoreRetryButton")
                     ) {
                         Text("Reintentar")
