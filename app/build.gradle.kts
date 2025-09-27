@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("jacoco")
 }
 
 android {
@@ -33,7 +34,8 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
 
-        buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY") ?: "\"\"")    }
+        buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY") ?: "\"\"")
+    }
 
     buildTypes {
         release {
@@ -66,6 +68,39 @@ android {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+tasks.register("jacocoTestReport", JacocoReport::class) {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*"
+    )
+
+    val buildDirectory = project.layout.buildDirectory
+
+    val debugTree = fileTree(buildDirectory.dir("intermediates/javac/debug")) {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree(buildDirectory.dir("tmp/kotlin-classes/debug")) {
+        exclude(fileFilter)
+    }
+
+    sourceDirectories.setFrom(files("src/main/java"))
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    executionData.setFrom(files(buildDirectory.file("jacoco/testDebugUnitTest.exec")))}
+
 dependencies {
     // Dependencias principales
     implementation(libs.androidx.core.ktx)
@@ -78,11 +113,15 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.koin.android)
     implementation(libs.koin.core)
+    implementation(libs.koin.androidx.compose)
     implementation(libs.coil.kt.coil.compose)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.accompanist.flowlayout)
 
-
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.android)
 
     // Retrofit & OkHttp
     implementation(libs.retrofit)
@@ -90,31 +129,24 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
 
-    // Dependencias de test
-    testImplementation(libs.junit)
-
-    // Dependencias de test para Android
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation (libs.mockk.android)
-
-    // Dependencias para debug
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    //Unit Testing
+    // Unit Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
-
-    // Para testing de Flows
     testImplementation(libs.turbine) {
         exclude(group = "org.junit.jupiter")
         exclude(group = "org.junit.platform")
     }
 
+    // Android Testing
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.mockk.android)
 
+    // Debug
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }

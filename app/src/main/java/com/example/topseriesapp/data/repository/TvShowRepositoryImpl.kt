@@ -2,6 +2,7 @@ package com.example.topseriesapp.data.repository
 
 import com.example.topseriesapp.coroutines.CoroutineDispatchers
 import com.example.topseriesapp.BuildConfig
+import com.example.topseriesapp.data.model.TvShowDetails
 import com.example.topseriesapp.data.model.TvShowResponse
 import com.example.topseriesapp.data.network.TMDBApiService
 import com.example.topseriesapp.utils.NetworkResponse
@@ -36,6 +37,32 @@ class TvShowRepositoryImpl(
                 NetworkResponse.Error("Error de red: ${e.message ?: "Error desconocido"}")
             } catch (e: Exception) {
                 NetworkResponse.Error("Error inesperado: ${e.message ?: "Error desconocido"}")
+            }
+        }
+    }
+    override suspend fun getTvShowDetails(seriesId: Int): NetworkResponse<TvShowDetails> {
+        return withContext(dispatchers.io) {
+            try {
+                val response = tmdbApiService.getTvShowDetails(
+                    seriesId = seriesId,
+                    apiKey = BuildConfig.TMDB_API_KEY
+                )
+
+                if (response.isSuccessful) {
+                    val details = response.body()
+                    if (details != null) {
+                        NetworkResponse.Success(details)
+                    } else {
+                        NetworkResponse.Error("La respuesta de la API para detalles está vacía pero fue exitosa (código ${response.code()}).")
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    NetworkResponse.Error("Error de API al obtener detalles: ${response.code()} ${response.message()}. Cuerpo: $errorBody")
+                }
+            } catch (e: IOException) {
+                NetworkResponse.Error("Error de red al obtener detalles: ${e.message ?: "Error desconocido"}")
+            } catch (e: Exception) {
+                NetworkResponse.Error("Error inesperado al obtener detalles: ${e.message ?: "Error desconocido"}")
             }
         }
     }

@@ -8,19 +8,19 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size // Para el tamaño del ícono
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons // Import para los íconos base
-import androidx.compose.material.icons.filled.Star // Import para el ícono de estrella
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment // Para alinear el texto y la estrella
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color // Para el color de la estrella
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -32,7 +32,7 @@ import coil.request.ImageRequest
 import com.example.topseriesapp.R
 import com.example.topseriesapp.data.model.TvShow
 import com.example.topseriesapp.utils.getImageUrl
-import java.util.Locale // Para formatear el número decimal
+import java.util.Locale
 import com.example.topseriesapp.ui.theme.TopSeriesAppTheme
 
 
@@ -41,10 +41,10 @@ import com.example.topseriesapp.ui.theme.TopSeriesAppTheme
 fun TvShowCard(
     tvShow: TvShow,
     onItemClick: (TvShow) -> Unit,
-    modifier: Modifier = Modifier // Recibe el modifier del llamador (que puede tener "tvShowItem_${tvShow.id}")
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier // El modifier pasado ya puede contener el testTag principal del item
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -54,21 +54,21 @@ fun TvShowCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp)
-                .testTag("tvShowCard_rowContainer_${tvShow.id}") // Tag para el Row interno
+                .testTag("tvShowCard_rowContainer_${tvShow.id}")
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(getImageUrl(tvShow.posterPath))
                     .crossfade(true)
-                    .placeholder(R.drawable.placeholder_image) // Asegúrate que este drawable existe
-                    .error(R.drawable.error_image)           // Asegúrate que este drawable existe
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.error_image)
                     .build(),
-                contentDescription = "Poster de ${tvShow.name}", // Bueno para accesibilidad y tests
+                contentDescription = "Poster de ${tvShow.name}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(80.dp)
-                    .testTag("tvShowCard_image_${tvShow.id}") // Tag para la imagen
+                    .testTag("tvShowCard_image_${tvShow.id}")
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column(
@@ -76,7 +76,7 @@ fun TvShowCard(
                     .padding(8.dp)
                     .fillMaxHeight()
                     .weight(1f)
-                    .testTag("tvShowCard_detailsColumn_${tvShow.id}"), // Tag para la columna de detalles
+                    .testTag("tvShowCard_detailsColumn_${tvShow.id}"),
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
@@ -84,15 +84,15 @@ fun TvShowCard(
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.testTag("tvShowCard_title_${tvShow.id}") // Tag para el título
+                    modifier = Modifier.testTag("tvShowCard_title_${tvShow.id}")
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = tvShow.firstAirDate?.take(4) ?: "N/A",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.testTag("tvShowCard_airDate_${tvShow.id}") // Tag para la fecha
+                    modifier = Modifier.testTag("tvShowCard_airDate_${tvShow.id}")
                 )
-                Spacer(modifier = Modifier.height(6.dp)) // Más espacio antes de la valoración
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // Fila para la valoración y la estrella
                 Row(
@@ -103,14 +103,14 @@ fun TvShowCard(
                         imageVector = Icons.Filled.Star,
                         contentDescription = "Valoración",
                         modifier = Modifier
-                            .size(16.dp) // Tamaño del ícono de estrella
+                            .size(16.dp)
                             .testTag("tvShowCard_starIcon_${tvShow.id}"),
-                        tint = Color(0xFFFFC107) // Color dorado para la estrella
+                        tint = Color(0xFFFFC107)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = String.format(Locale.US, "%.1f", tvShow.voteAverage), // Valoración
-                        style = MaterialTheme.typography.bodySmall, // Un poco más pequeño para la valoración
+                        text = String.format(Locale.US, "%.1f", tvShow.voteAverage),
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.testTag("tvShowCard_voteAverage_${tvShow.id}")
                     )
                 }
