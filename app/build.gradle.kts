@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("jacoco")
 }
 
 android {
@@ -33,7 +34,8 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
 
-        buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY") ?: "\"\"")    }
+        buildConfigField("String", "TMDB_API_KEY", localProperties.getProperty("TMDB_API_KEY") ?: "\"\"")
+    }
 
     buildTypes {
         release {
@@ -65,6 +67,39 @@ android {
         }
     }
 }
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+tasks.register("jacocoTestReport", JacocoReport::class) {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*"
+    )
+
+    val buildDirectory = project.layout.buildDirectory
+
+    val debugTree = fileTree(buildDirectory.dir("intermediates/javac/debug")) {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree(buildDirectory.dir("tmp/kotlin-classes/debug")) {
+        exclude(fileFilter)
+    }
+
+    sourceDirectories.setFrom(files("src/main/java"))
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    executionData.setFrom(files(buildDirectory.file("jacoco/testDebugUnitTest.exec")))}
 
 dependencies {
     // Dependencias principales
