@@ -1,4 +1,4 @@
-name: CI pipieline
+name: CI pipeline
 
 on:
   push:
@@ -33,9 +33,14 @@ jobs:
       - name: Dar permisos de ejecución al gradle wrapper
         run: chmod +x ./gradlew
 
+      # Ejecutamos los tests y generamos el reporte de cobertura
+      - name: Ejecutar tests con JaCoCo
+        run: ./gradlew clean testDebugUnitTest jacocoTestReport
+
       - name: Build de la app
         run: ./gradlew assembleDebug --parallel --configure-on-demand
 
+      # Analizamos en SonarCloud pasando la ruta al XML de cobertura
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -44,4 +49,5 @@ jobs:
             -Dsonar.projectKey=TopSeriesApp \
             -Dsonar.organization=davigo2411 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.coverage.jacoco.xmlReportPaths=app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
