@@ -78,49 +78,40 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.koin.android)
     implementation(libs.koin.core)
+    implementation(libs.koin.androidx.compose)
     implementation(libs.coil.kt.coil.compose)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.accompanist.flowlayout)
 
-
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.android)
 
     // Retrofit & OkHttp
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
-    implementation(libs.androidx.navigation.runtime.android)
 
-    // Dependencias de test
-    testImplementation(libs.junit)
-
-    // Dependencias de test para Android
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation (libs.mockk.android)
-    implementation(libs.koin.androidx.compose)
-
-    // Dependencias para debug
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    //Unit Testing
+    // Unit Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
-
-    // Para testing de Flows
     testImplementation(libs.turbine) {
         exclude(group = "org.junit.jupiter")
         exclude(group = "org.junit.platform")
     }
 
-    //JetPack Compose Navigation
-    implementation(libs.androidx.navigation.compose)
+    // Android Testing
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.mockk.android)
 
-
-
+    // Debug
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }

@@ -67,7 +67,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -77,7 +80,7 @@ class PopularTvShowsScreenTest {
             .assertIsDisplayed()
 
         composeTestRule
-            .onNodeWithText("Popular Tv shows")
+            .onNodeWithText("Popular TV Shows")
             .assertIsDisplayed()
     }
 
@@ -95,7 +98,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -108,7 +114,7 @@ class PopularTvShowsScreenTest {
         composeTestRule
             .onNodeWithTag("initialRetryButton")
             .assertIsDisplayed()
-            .assertTextEquals("Reintentar")
+            .assertTextEquals("Retry")
     }
 
     @Test
@@ -127,7 +133,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -169,7 +178,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -177,7 +189,7 @@ class PopularTvShowsScreenTest {
         composeTestRule
             .onNodeWithTag("emptyStateText")
             .assertIsDisplayed()
-            .assertTextEquals("No hay series populares para mostrar.")
+            .assertTextEquals("No popular TV shows to display.")
     }
 
     @Test
@@ -196,7 +208,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -227,7 +242,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -235,7 +253,7 @@ class PopularTvShowsScreenTest {
         composeTestRule
             .onNodeWithTag("loadMoreErrorMessage")
             .assertIsDisplayed()
-            .assertTextContains("Error al cargar más: Error al cargar más series")
+            .assertTextContains("Error loading more: Error al cargar más series")
 
         composeTestRule
             .onNodeWithTag("loadMoreRetryButton")
@@ -256,7 +274,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
@@ -265,7 +286,6 @@ class PopularTvShowsScreenTest {
             .onNodeWithTag("tvShowItem_1")
             .performClick()
 
-        // Por ahora solo verificamos que el elemento es clickeable
         composeTestRule
             .onNodeWithTag("tvShowItem_1")
             .assertIsDisplayed()
@@ -285,7 +305,10 @@ class PopularTvShowsScreenTest {
         // When
         composeTestRule.setContent {
             TopSeriesAppTheme {
-                PopularTvShowsScreen(viewModel = viewModel)
+                PopularTvShowsScreen(
+                    viewModel = viewModel,
+                    onNavigateToDetails = { /* Mock navigation */ }
+                )
             }
         }
 
