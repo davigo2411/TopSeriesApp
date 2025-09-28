@@ -8,6 +8,7 @@ import com.example.topseriesapp.coroutines.DefaultCoroutineDispatchers
 import com.example.topseriesapp.data.network.TMDBApiService
 import com.example.topseriesapp.data.repository.TvShowRepository
 import com.example.topseriesapp.data.repository.TvShowRepositoryImpl
+import com.example.topseriesapp.ui.MainViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,10 +22,13 @@ import com.example.topseriesapp.domain.usecase.GetTvShowDetailsUseCaseImpl
 import com.example.topseriesapp.ui.showsdetails.ConnectivityChecker
 import com.example.topseriesapp.ui.showsdetails.TvShowDetailsViewModel
 import com.example.topseriesapp.data.connectivity.NetworkConnectivityChecker
+import com.example.topseriesapp.data.preferences.ThemeDataStore
+import org.koin.android.ext.koin.androidContext
 
 private const val BASE_URL = "https://api.themoviedb.org/3/"
 
 val appModule = module {
+    single { ThemeDataStore(androidContext()) }
 
     // Definición para OkHttpClient
     single {
@@ -98,6 +102,9 @@ val utilsModule = module {
 }
 
 val viewModelModule = module {
+
+    viewModel { MainViewModel(get()) }
+
     viewModel {
         PopularTvShowsViewModel(getPopularTvShowsUseCase = get())
     }

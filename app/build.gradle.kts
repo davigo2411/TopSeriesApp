@@ -157,4 +157,7 @@ dependencies {
     // Gson
     implementation(libs.gson)
 
+    //otras dependencias
+    implementation(libs.androidx.datastore.preferences)
+
 }
