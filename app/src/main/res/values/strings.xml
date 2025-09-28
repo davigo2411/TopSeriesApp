@@ -20,10 +20,17 @@
     <string name="seasons_count">Seasons: %1$d</string>
     <string name="episodes_count">Episodes: %1$d</string>
     <string name="votes">(%1$d votes)</string>
+    <string name="genres">Genres</string>
     <string name="star">⭐</string>
 
     <!-- TvShowCard -->
     <string name="poster_of">Poster of %1$s</string>
     <string name="na">N/A</string>
     <string name="rating">Rating</string>
+
+    <string name="season_air_date">Aired: %1$s</string>
+
+    <!-- <string name="error_prefix">Error:</string> -->
+
+    <!-- <string name="error_loading_more">Error loading more:</string> -->
 </resources>

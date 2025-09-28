@@ -20,7 +20,7 @@
         android:name="com.example.topseriesapp.MainApplication">
         <activity
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:theme="@style/Theme.TopSeriesApp"
             android:name="com.example.topseriesapp.MainActivity">
