@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">TopSeriesApp</string>
+    <!-- Pantalla Popular TV Shows -->
+    <string name="popular_tv_shows">Popular TV Shows</string>
+    <string name="retry">Retry</string>
+    <string name="no_popular_shows">No popular TV shows to display.</string>
+    <string name="error_prefix">Error: </string>
+    <string name="error_loading_more">Error loading more: </string>
+
+    <!-- Pantalla de detalles -->
+    <string name="details">Details</string>
+    <string name="back">Back</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="creators">Creators</string>
+    <string name="seasons">Seasons</string>
+    <string name="not_available">Not available</string>
+    <string name="no_description">No description</string>
+    <string name="state">Status: %1$s</string>
+    <string name="start_date">Start: %1$s</string>
+    <string name="seasons_count">Seasons: %1$d</string>
+    <string name="episodes_count">Episodes: %1$d</string>
+    <string name="votes">(%1$d votes)</string>
+    <string name="star">⭐</string>
+
+    <!-- TvShowCard -->
+    <string name="poster_of">Poster of %1$s</string>
+    <string name="na">N/A</string>
+    <string name="rating">Rating</string>
 </resources>

@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,7 +64,7 @@ fun TvShowCard(
                     .placeholder(R.drawable.placeholder_image)
                     .error(R.drawable.error_image)
                     .build(),
-                contentDescription = "Poster de ${tvShow.name}",
+                contentDescription = stringResource(R.string.poster_of, tvShow.name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
@@ -88,7 +89,7 @@ fun TvShowCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = tvShow.firstAirDate?.take(4) ?: "N/A",
+                    text = tvShow.firstAirDate?.take(4) ?: stringResource(R.string.na),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.testTag("tvShowCard_airDate_${tvShow.id}")
                 )
@@ -101,7 +102,7 @@ fun TvShowCard(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Star,
-                        contentDescription = "Valoración",
+                        contentDescription = stringResource(R.string.rating),
                         modifier = Modifier
                             .size(16.dp)
                             .testTag("tvShowCard_starIcon_${tvShow.id}"),
@@ -128,8 +129,8 @@ fun TvShowCardPreview() {
         TvShowCard(
             tvShow = TvShow(
                 id = 1,
-                name = "Nombre de Serie Muy Largo Que Debería Hacer Ellipsis",
-                overview = "Esta es una descripción de la serie.",
+                name = "Very Long TV Show Name That Should Make Ellipsis",
+                overview = "This is a TV show description.",
                 posterPath = "/ejMNOIsL22GPdAATn2s5xK3q2S5.jpg",
                 backdropPath = null,
                 voteAverage = 8.5,

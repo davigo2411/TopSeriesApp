@@ -29,8 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.topseriesapp.R
 import com.example.topseriesapp.data.model.TvShow
 
 
@@ -46,7 +48,7 @@ fun PopularTvShowsScreen(
         modifier = Modifier.testTag("popularTvShowsScreen_scaffold"),
         topBar = {
             TopAppBar(
-                title = { Text("Popular TV Shows") },
+                title = { Text(stringResource(R.string.popular_tv_shows)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -70,7 +72,7 @@ fun PopularTvShowsScreen(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Error: ${uiState.error}",
+                                text = stringResource(R.string.error_prefix) + uiState.error,
                                 modifier = Modifier.testTag("initialErrorMessage")
                             )
                             Spacer(Modifier.height(8.dp))
@@ -78,7 +80,7 @@ fun PopularTvShowsScreen(
                                 onClick = { viewModel.retryInitialLoad() },
                                 modifier = Modifier.testTag("initialRetryButton")
                             ) {
-                                Text("Retry")
+                                Text(stringResource(R.string.retry))
                             }
                         }
                     }
@@ -87,7 +89,7 @@ fun PopularTvShowsScreen(
                 uiState.tvShows.isEmpty()  -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "No popular TV shows to display.",
+                            text = stringResource(R.string.no_popular_shows),
                             modifier = Modifier.testTag("emptyStateText")
                         )
                     }
@@ -156,7 +158,7 @@ fun PopularTvShowList(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Error loading more: ${uiState.error}",
+                        text = stringResource(R.string.error_loading_more) + uiState.error,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.testTag("loadMoreErrorMessage")
                     )
@@ -165,7 +167,7 @@ fun PopularTvShowList(
                         onClick = onLoadMore,
                         modifier = Modifier.testTag("loadMoreRetryButton")
                     ) {
-                        Text("Retry")
+                        Text(stringResource(R.string.retry))
                     }
                 }
             }

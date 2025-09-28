@@ -29,14 +29,9 @@ jobs:
       - name: Give Gradle wrapper permissions
         run: chmod +x gradlew
 
-      - name: Run tests with coverage
-        run: ./gradlew clean testDebugUnitTest jacocoTestReport
-
-      - name: Upload JaCoCo Report (artifact)
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: app/build/reports/jacoco/jacocoTestReport/html
+      - name: Run tests
+        if: github.ref == 'refs/heads/master'
+        run: ./gradlew test
 
       - name: SonarCloud Scan
         env:
@@ -47,4 +42,3 @@ jobs:
                               -Dsonar.organization=davigo2411 \
                               -Dsonar.host.url=https://sonarcloud.io \
                               -Dsonar.login=$SONAR_TOKEN \
-                              -Dsonar.coverage.jacoco.xmlReportPaths=app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml

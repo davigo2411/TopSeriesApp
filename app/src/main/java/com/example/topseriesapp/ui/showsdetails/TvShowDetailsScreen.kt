@@ -18,10 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.topseriesapp.R
 import com.example.topseriesapp.data.model.TvShowDetails
 import org.koin.androidx.compose.koinViewModel
 
@@ -39,7 +41,7 @@ fun TvShowDetailsScreen(
                 title = {
                     val titleText = when (uiState) {
                         is DetailsScreenUiState.Success -> (uiState as DetailsScreenUiState.Success).tvShowDetails.name
-                        else -> "Details"
+                        else -> stringResource(R.string.details)
                     }
                     Text(
                         text = titleText,
@@ -51,7 +53,7 @@ fun TvShowDetailsScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -74,10 +76,10 @@ fun TvShowDetailsScreen(
                 }
                 is DetailsScreenUiState.Error -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Error: ${currentState.message}")
+                        Text(stringResource(R.string.error_prefix) + currentState.message)
                         Spacer(Modifier.height(8.dp))
                         Button(onClick = { viewModel.retry() }) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -130,7 +132,7 @@ fun TvShowDetailsScreen(
                         Row(modifier = Modifier.padding(16.dp)) {
                             AsyncImage(
                                 model = "https://image.tmdb.org/t/p/w500${show.posterPath}",
-                                contentDescription = show.name,
+                                contentDescription = stringResource(R.string.poster_of, show.name),
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .width(120.dp)
@@ -139,12 +141,27 @@ fun TvShowDetailsScreen(
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
-                                Text("⭐ ${show.voteAverage} (${show.voteCount} votos)",
-                                    style = MaterialTheme.typography.bodyLarge)
-                                Text("Estado: ${show.status}", style = MaterialTheme.typography.bodyMedium)
-                                Text("Inicio: ${show.firstAirDate}", style = MaterialTheme.typography.bodyMedium)
-                                Text("Temporadas: ${show.numberOfSeasons}", style = MaterialTheme.typography.bodyMedium)
-                                Text("Episodios: ${show.numberOfEpisodes}", style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    stringResource(R.string.star) + " ${show.voteAverage} " +
+                                            stringResource(R.string.votes, show.voteCount ?: 0),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                Text(
+                                    stringResource(R.string.state, show.status ?: stringResource(R.string.na)),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    stringResource(R.string.start_date, show.firstAirDate ?: stringResource(R.string.na)),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    stringResource(R.string.seasons_count, show.numberOfSeasons ?: 0),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    stringResource(R.string.episodes_count, show.numberOfEpisodes ?: 0),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
                         }
 
@@ -153,8 +170,8 @@ fun TvShowDetailsScreen(
                             FlowRow(
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp), // Reemplaza mainAxisSpacing
-                                verticalArrangement = Arrangement.spacedBy(4.dp)    // Reemplaza crossAxisSpacing
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 show.genres.forEach { genre ->
                                     AssistChip(
@@ -167,15 +184,18 @@ fun TvShowDetailsScreen(
 
                         // Sinopsis
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Sinopsis", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.synopsis), style = MaterialTheme.typography.titleMedium)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(show.overview ?: "No disponible", style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                show.overview ?: stringResource(R.string.not_available),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
 
                         // Creadores
                         if (!show.createdBy.isNullOrEmpty()) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Creadores", style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.creators), style = MaterialTheme.typography.titleMedium)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     show.createdBy.forEach { creator ->
@@ -198,7 +218,7 @@ fun TvShowDetailsScreen(
                         // Temporadas
                         if (!show.seasons.isNullOrEmpty()) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Temporadas", style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.seasons), style = MaterialTheme.typography.titleMedium)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 show.seasons.forEach { season ->
                                     Card(
@@ -220,10 +240,12 @@ fun TvShowDetailsScreen(
                                             Spacer(modifier = Modifier.width(12.dp))
                                             Column {
                                                 season.name?.let { Text(it, style = MaterialTheme.typography.titleSmall) }
-                                                Text("Episodios: ${season.episodeCount}",
-                                                    style = MaterialTheme.typography.bodySmall)
                                                 Text(
-                                                    season.overview?.takeIf { it.isNotEmpty() } ?: "Sin descripción",
+                                                    stringResource(R.string.episodes_count, season.episodeCount ?: 0),
+                                                    style = MaterialTheme.typography.bodySmall
+                                                )
+                                                Text(
+                                                    season.overview?.takeIf { it.isNotEmpty() } ?: stringResource(R.string.no_description),
                                                     style = MaterialTheme.typography.bodySmall,
                                                     maxLines = 3,
                                                     overflow = TextOverflow.Ellipsis
