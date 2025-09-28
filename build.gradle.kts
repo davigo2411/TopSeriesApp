@@ -7,6 +7,7 @@ plugins {
 
     // Plugin de SonarQube
     id("org.sonarqube") version "4.4.1.3373"
+
 }
 
 sonarqube {
