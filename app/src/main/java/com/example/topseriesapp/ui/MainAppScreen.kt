@@ -18,12 +18,16 @@ import com.example.topseriesapp.R
 import com.example.topseriesapp.ui.navigation.AppNavGraph
 import com.example.topseriesapp.ui.navigation.AppDestinations
 
+/**
+ * Define la estructura de un ítem de la barra de navegación inferior.
+ */
 data class BottomNavItem(
     val route: String,
     val labelResId: Int,
     val iconPainterResId: Int
 )
 
+// Lista de ítems para la barra de navegación inferior.
 val bottomNavItemsList = listOf(
     BottomNavItem(
         route = AppDestinations.POPULAR_SHOWS,
@@ -37,20 +41,28 @@ val bottomNavItemsList = listOf(
     )
 )
 
+/**
+ * Composable principal que estructura la pantalla de la aplicación.
+ * Incluye una barra de navegación inferior y el grafo de navegación para el contenido.
+ *
+ * @param mainViewModel ViewModel principal para acceder a estados globales y acciones.
+ * @param onLanguageChanged Callback invocado cuando se necesita recrear la actividad por cambio de idioma.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainAppScreen(
     mainViewModel: MainViewModel,
-    onLanguageChanged: () -> Unit // Parámetro añadido para el callback de cambio de idioma
+    onLanguageChanged: () -> Unit
 ) {
-    val navController = rememberNavController()
+    val navController = rememberNavController() // Controlador para la navegación Compose.
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val currentDestination = navBackStackEntry?.destination // Destino actual en la navegación.
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar { // Barra de navegación inferior de Material 3.
                 bottomNavItemsList.forEach { item ->
+                    // Determina si el ítem actual está seleccionado en la jerarquía de navegación.
                     val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
                     NavigationBarItem(
                         icon = {
@@ -76,7 +88,7 @@ fun MainAppScreen(
                                 restoreState = true
                             }
                         },
-                        colors = NavigationBarItemDefaults.colors(
+                        colors = NavigationBarItemDefaults.colors( // Personaliza los colores del ítem.
                             selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             selectedTextColor = MaterialTheme.colorScheme.onSurface,
                             indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -88,6 +100,7 @@ fun MainAppScreen(
             }
         }
     ) { innerPadding ->
+        // Contenedor para el contenido de las diferentes pantallas.
         AppNavGraph(
             navController = navController,
             modifier = Modifier.padding(innerPadding),

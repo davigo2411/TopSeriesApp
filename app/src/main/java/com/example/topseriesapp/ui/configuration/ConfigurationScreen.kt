@@ -25,28 +25,35 @@ import androidx.compose.ui.unit.dp
 import com.example.topseriesapp.R
 import com.example.topseriesapp.utils.LocaleHelper
 
+// Define las opciones disponibles para la configuración del tema de la aplicación.
 enum class ThemeSetting { LIGHT, DARK, SYSTEM_DEFAULT }
 
+/**
+ * Composable que representa la pantalla de configuración de la aplicación.
+ * Permite al usuario cambiar el tema y el idioma.
+ *
+ * @param currentThemeSetting El ajuste de tema actual.
+ * @param onThemeSettingChanged Callback invocado cuando el usuario cambia la selección de tema.
+ * @param onLanguageChanged Callback invocado cuando el usuario selecciona un nuevo idioma y se aplica.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfigurationScreen(
     currentThemeSetting: ThemeSetting,
     onThemeSettingChanged: (ThemeSetting) -> Unit,
-    onLanguageChanged: () -> Unit, // Parámetro añadido para el callback
+    onLanguageChanged: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     var showLanguageDialog by remember { mutableStateOf(false) }
 
-    // Obtiene el código de idioma actual de la aplicación ("en", "es")
+    // Determina el nombre legible del idioma actual de la aplicación.
     val currentAppLanguageCode = LocaleHelper.getCurrentAppLocale(context).language
-
-    // Obtiene el nombre a mostrar para el idioma actual usando recursos de string
     val currentLanguageDisplayName = remember(currentAppLanguageCode) {
         when (currentAppLanguageCode) {
             "es" -> context.getString(R.string.language_spanish)
             "en" -> context.getString(R.string.language_english)
-            else -> context.getString(R.string.language_english) // Por defecto, inglés
+            else -> context.getString(R.string.language_english) // Idioma por defecto si no se reconoce
         }
     }
 
@@ -60,18 +67,18 @@ fun ConfigurationScreen(
                 )
             )
         }
-    ) { innerPaddingScaffoldInterno ->
+    ) { innerPadding ->
         Column(
             modifier = modifier
-                .padding(innerPaddingScaffoldInterno) // Padding de la TopAppBar de esta pantalla
+                .padding(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // Para permitir scroll si el contenido crece
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            // Sección de Tema
+            // Sección para la configuración del Tema
             Text(
-                text = stringResource(R.string.theme_settings_title), // "Theme Settings" o "Apariencia"
+                text = stringResource(R.string.theme_settings_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -99,20 +106,19 @@ fun ConfigurationScreen(
             HorizontalDivider()
             Spacer(Modifier.height(24.dp))
 
-            // Sección de Idioma
+            // Sección para la configuración del Idioma
             Text(
-                text = stringResource(R.string.language_settings_title), // "Language" o "Idioma"
+                text = stringResource(R.string.language_settings_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             OutlinedButton(
                 onClick = { showLanguageDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween, // Para separar el texto y el idioma actual
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.language_settings_title))
@@ -122,14 +128,14 @@ fun ConfigurationScreen(
         }
     }
 
+    // Muestra el diálogo de selección de idioma si showLanguageDialog es true.
     if (showLanguageDialog) {
         LanguageSelectionDialog(
             currentSelectedLanguageCode = currentAppLanguageCode,
             onLanguageSelected = { selectedLanguageCode ->
-                // Solo actualiza y recrea si el idioma realmente cambió
                 if (currentAppLanguageCode != selectedLanguageCode) {
                     LocaleHelper.setLocale(context, selectedLanguageCode)
-                    onLanguageChanged() // Llama al callback para recrear la Activity
+                    onLanguageChanged() // Notifica que el idioma cambió para que la Activity se recree.
                 }
                 showLanguageDialog = false
             },
@@ -138,15 +144,17 @@ fun ConfigurationScreen(
     }
 }
 
+/**
+ * Diálogo para que el usuario seleccione un idioma para la aplicación.
+ */
 @Composable
 private fun LanguageSelectionDialog(
     currentSelectedLanguageCode: String,
     onLanguageSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val languages = remember {
+    val languages = remember { // Lista de idiomas soportados
         listOf(
-            // Par: (ID del recurso de string para el nombre a mostrar, código de idioma)
             Pair(R.string.language_english, "en"),
             Pair(R.string.language_spanish, "es")
         )
@@ -161,43 +169,39 @@ private fun LanguageSelectionDialog(
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .clickable { onLanguageSelected(languageCode) } // Permite clickear toda la fila
+                            .clickable { onLanguageSelected(languageCode) }
                             .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = currentSelectedLanguageCode == languageCode,
-                            onClick = { onLanguageSelected(languageCode) } // Acción al clickear el RadioButton
+                            onClick = { onLanguageSelected(languageCode) }
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(displayNameResId)) // Muestra el nombre del idioma desde strings.xml
+                        Text(stringResource(displayNameResId))
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(android.R.string.cancel).uppercase()) // Texto estándar de "Cancelar"
+                Text(stringResource(android.R.string.cancel).uppercase())
             }
         }
     )
 }
 
-
+/**
+ * Composable que representa un círculo de opción de tema (Claro/Oscuro).
+ */
 @Composable
 private fun ThemeOptionCircle(
     color: Color,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
-
 ) {
-    val borderColor = if (isSelected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.outline
-    }
-
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
     Box(
         modifier = modifier
             .size(48.dp)
@@ -212,6 +216,9 @@ private fun ThemeOptionCircle(
     ) {}
 }
 
+/**
+ * Composable que representa la opción de tema "Predeterminado del sistema".
+ */
 @Composable
 private fun ThemeOptionSystemDefault(
     isSelected: Boolean,
@@ -236,3 +243,4 @@ private fun ThemeOptionSystemDefault(
         )
     }
 }
+

@@ -35,10 +35,12 @@ class MainActivity : ComponentActivity() {
             TopSeriesAppTheme(darkTheme = useDarkTheme) {
                 MainAppScreen(
                     mainViewModel = mainViewModel,
-                    onLanguageChanged = { this.recreate() }
+                    onLanguageChanged = {
+                        mainViewModel.signalLanguageChange()
+                        this.recreate()
+                    }
                 )
             }
         }
     }
 }
-
