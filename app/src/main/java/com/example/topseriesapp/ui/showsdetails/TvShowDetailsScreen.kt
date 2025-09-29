@@ -29,6 +29,8 @@ import coil.compose.AsyncImage
 import com.example.topseriesapp.R
 import com.example.topseriesapp.data.model.TvShowDetails
 import org.koin.androidx.compose.koinViewModel
+import kotlin.text.format
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -225,8 +227,10 @@ fun ShowDetailsMainInfoRow(show: TvShowDetails, modifier: Modifier = Modifier) {
 @Composable
 fun ShowDetailsCoreInfo(show: TvShowDetails, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
+        val formattedVoteAverage = String.format(Locale.US, "%.1f", show.voteAverage ?: 0.0)
+
         Text(
-            stringResource(R.string.star) + " ${show.voteAverage} " +
+            stringResource(R.string.star) + " $formattedVoteAverage " +
                     stringResource(R.string.votes, show.voteCount ?: 0),
             style = MaterialTheme.typography.bodyLarge
         )
@@ -336,7 +340,7 @@ fun ShowDetailsSeasons(show: TvShowDetails, modifier: Modifier = Modifier) {
                                 contentDescription = season.name,
                                 modifier = Modifier
                                     .width(80.dp)
-                                    .aspectRatio(2f/3f)
+                                    .aspectRatio(2f / 3f)
                                     .clip(RoundedCornerShape(8.dp)),
                                 contentScale = ContentScale.Crop
                             )
