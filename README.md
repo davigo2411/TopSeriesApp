@@ -23,6 +23,8 @@ Aplicación Android para explorar y consultar series de TV populares, con detall
 ---
 
 ## 📦 Instalación
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/usuario/TopSeriesApp.git
+
+1. Descarga la APK desde el release: [TopSeriesApp v1.0.0](https://github.com/usuario/TopSeriesApp/releases)
+2. Copia la APK a tu dispositivo Android.
+3. Abre la APK y permite la instalación desde fuentes desconocidas si se solicita.
+4. ¡Listo! La aplicación estará instalada en tu móvil.
