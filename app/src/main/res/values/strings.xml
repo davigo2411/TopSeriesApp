@@ -20,10 +20,35 @@
     <string name="seasons_count">Seasons: %1$d</string>
     <string name="episodes_count">Episodes: %1$d</string>
     <string name="votes">(%1$d votes)</string>
+    <string name="genres">Genres</string>
     <string name="star">⭐</string>
 
     <!-- TvShowCard -->
     <string name="poster_of">Poster of %1$s</string>
     <string name="na">N/A</string>
     <string name="rating">Rating</string>
+
+    <string name="season_air_date">Aired: %1$s</string>
+    <string name="bottom_nav_home">Home</string>
+
+    <!-- Pantalla de configuración -->
+    <string name="bottom_nav_configuration">Configuration</string>
+    <string name="configuration_title">Configuration</string>
+    <string name="theme_settings_title">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_light_description">Select light theme </string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_dark_description">Select dark theme</string>
+    <string name="theme_system_default">System Default</string>
+    <string name="theme_system_default_description">Use system default theme</string>
+    <string name="select_theme">Select Theme</string>
+    <string name="current_theme_is">Current Theme:</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Strings para la selección de idioma -->
+    <string name="language_settings_title">Language</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Spanish</string>
+
 </resources>

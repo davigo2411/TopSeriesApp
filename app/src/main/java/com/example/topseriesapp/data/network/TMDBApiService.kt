@@ -13,8 +13,9 @@ interface TMDBApiService {
     suspend fun getPopularTvShows(
         // Devuelve una lista de TvShows
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "en-US",
-        @Query("page") page: Int = 1
+        @Query("language") language: String,
+        @Query("page") page: Int = 1,
+        @Query("include_adult") includeAdult: Boolean = false
     ): Response<TvShowResponse>
 
     //GET TV shows details by ID
@@ -22,6 +23,7 @@ interface TMDBApiService {
     suspend fun getTvShowDetails(
         @Path("series_id") seriesId: Int,
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "en-US"
+        @Query("language") language: String,
+        @Query("include_adult") includeAdult: Boolean = false
     ): Response<TvShowDetails>
 }

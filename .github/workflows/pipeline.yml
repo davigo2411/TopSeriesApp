@@ -3,10 +3,12 @@ name: Android CI
 on:
   push:
     branches:
-      [develop, master]
+      - develop
+      - master
   pull_request:
     branches:
-      [develop, master]
+      - develop
+      - master
 
 jobs:
   build:
@@ -30,5 +32,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run tests
-        if: github.ref == 'refs/heads/master'
         run: ./gradlew test

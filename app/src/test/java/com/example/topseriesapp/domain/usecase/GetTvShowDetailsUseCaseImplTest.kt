@@ -11,9 +11,11 @@ import com.example.topseriesapp.data.model.Season
 import com.example.topseriesapp.data.model.SpokenLanguage
 import com.example.topseriesapp.data.repository.TvShowRepository
 import com.example.topseriesapp.utils.NetworkResponse
-import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -25,17 +27,18 @@ class GetTvShowDetailsUseCaseImplTest {
  private lateinit var mockTvShowRepository: TvShowRepository
  private lateinit var getTvShowDetailsUseCase: GetTvShowDetailsUseCaseImpl
 
+ private val testSeriesIdConstant = 123 // ID constante para los datos falsos
+
  @Before
  fun setUp() {
   mockTvShowRepository = mockk()
   getTvShowDetailsUseCase = GetTvShowDetailsUseCaseImpl(mockTvShowRepository)
  }
 
- @Test
- fun `invoke DEBERIA llamar a getTvShowDetails del repositorio Y devolver Success CUANDO repositorio devuelve Success`() = runTest {
-  val seriesId = 123
-  val fakeTvShowDetails = TvShowDetails(
-   id = seriesId,
+ // Función helper para crear un objeto TvShowDetails falso para los tests.
+ private fun createFakeTvShowDetails(): TvShowDetails {
+  return TvShowDetails(
+   id = testSeriesIdConstant,
    name = "Test Show",
    overview = "Test Overview in English",
    posterPath = "/testPoster.jpg",
@@ -58,33 +61,19 @@ class GetTvShowDetailsUseCaseImplTest {
    inProduction = true,
    languages = listOf("en", "es"),
    lastEpisodeToAir = EpisodeToAir(
-    id = 101,
-    name = "The Last Test",
-    overview = "The final test episode.",
-    voteAverage = 9.0,
-    voteCount = 50,
-    airDate = "2024-03-01",
-    episodeNumber = 10,
-    productionCode = "S02E10",
-    runtime = 45,
-    seasonNumber = 2,
-    showId = seriesId,
-    stillPath = "/lastEpisode.jpg"
+    id = 101, name = "The Last Test", overview = "The final test episode.",
+    voteAverage = 9.0, voteCount = 50, airDate = "2024-03-01",
+    episodeNumber = 10, productionCode = "S02E10", runtime = 45,
+    seasonNumber = 2, showId = testSeriesIdConstant, stillPath = "/lastEpisode.jpg"
    ),
    nextEpisodeToAir = null,
-   networks = listOf(
-    Network(id = 1, logoPath = "/networklogo.png", name = "Test Network", originCountry = "US")
-   ),
+   networks = listOf(Network(id = 1, logoPath = "/networklogo.png", name = "Test Network", originCountry = "US")),
    originCountry = listOf("US", "CA"),
    originalLanguage = "en",
    originalName = "Original Test Show Name",
    popularity = 75.5,
-   productionCompanies = listOf(
-    ProductionCompany(id = 1, logoPath = "/companylogo.png", name = "Test Production Co", originCountry = "US")
-   ),
-   productionCountries = listOf(
-    ProductionCountry(iso31661 = "US", name = "United States of America")
-   ),
+   productionCompanies = listOf(ProductionCompany(id = 1, logoPath = "/companylogo.png", name = "Test Production Co", originCountry = "US")),
+   productionCountries = listOf(ProductionCountry(iso31661 = "US", name = "United States of America")),
    seasons = listOf(
     Season(airDate = "2023-01-01", episodeCount = 10, id = 1, name = "Season 1", overview = "First season overview.", posterPath = "/season1.jpg", seasonNumber = 1, voteAverage = 8.2),
     Season(airDate = "2024-01-01", episodeCount = 10, id = 2, name = "Season 2", overview = "Second season overview.", posterPath = "/season2.jpg", seasonNumber = 2, voteAverage = 8.8)
@@ -95,29 +84,47 @@ class GetTvShowDetailsUseCaseImplTest {
    ),
    type = "Scripted"
   )
-  val expectedResponse = NetworkResponse.Success(fakeTvShowDetails)
-
-  coEvery { mockTvShowRepository.getTvShowDetails(seriesId) } returns expectedResponse
-
-  val actualResponse = getTvShowDetailsUseCase(seriesId)
-
-  coVerify(exactly = 1) { mockTvShowRepository.getTvShowDetails(seriesId) }
-  assertEquals(expectedResponse, actualResponse)
  }
 
  @Test
- fun `invoke DEBERIA llamar a getTvShowDetails del repositorio Y devolver Error CUANDO repositorio devuelve Error`() = runTest {
-  val seriesId = 456
+ fun `invoke DEBERIA llamar a getTvShowDetails del repositorio Y devolver Flow con Success CUANDO repositorio devuelve Flow con Success`() = runTest {
+  val fakeTvShowDetails = createFakeTvShowDetails()
+  val expectedResponseFromRepo = NetworkResponse.Success(fakeTvShowDetails)
+
+  // Configura el mock del repositorio para que devuelva un Flow con la respuesta esperada.
+  every { mockTvShowRepository.getTvShowDetails(testSeriesIdConstant) } returns flowOf(expectedResponseFromRepo)
+
+  // Ejecuta el caso de uso y obtiene el primer valor emitido por el Flow.
+  val actualResponseValue = getTvShowDetailsUseCase(testSeriesIdConstant).first()
+
+  // Verifica que el metodo del repositorio fue llamado.
+  coVerify(exactly = 1) { mockTvShowRepository.getTvShowDetails(testSeriesIdConstant) }
+
+  // Verifica que la respuesta es de tipo Success y contiene los datos correctos.
+  assertTrue(actualResponseValue is NetworkResponse.Success<*>)
+  assertEquals(fakeTvShowDetails, (actualResponseValue as NetworkResponse.Success<TvShowDetails>).data)
+  assertEquals(expectedResponseFromRepo, actualResponseValue)
+ }
+
+ @Test
+ fun `invoke DEBERIA llamar a getTvShowDetails del repositorio Y devolver Flow con Error CUANDO repositorio devuelve Flow con Error`() = runTest {
+  val seriesIdForErrorTest = 456
   val errorMessage = "Error de red desde el repositorio"
-  val expectedResponse = NetworkResponse.Error<TvShowDetails>(errorMessage)
+  val expectedResponseFromRepo = NetworkResponse.Error<TvShowDetails>(errorMessage)
 
-  coEvery { mockTvShowRepository.getTvShowDetails(seriesId) } returns expectedResponse
+  // Configura el mock del repositorio para que devuelva un Flow con un error.
+  every { mockTvShowRepository.getTvShowDetails(seriesIdForErrorTest) } returns flowOf(expectedResponseFromRepo)
 
-  val actualResponse = getTvShowDetailsUseCase(seriesId)
+  // Ejecuta el caso de uso y obtiene el primer valor emitido por el Flow.
+  val actualResponseValue = getTvShowDetailsUseCase(seriesIdForErrorTest).first()
 
-  coVerify(exactly = 1) { mockTvShowRepository.getTvShowDetails(seriesId) }
-  assertEquals(expectedResponse, actualResponse)
-  assertTrue(actualResponse is NetworkResponse.Error)
-  assertEquals(errorMessage, (actualResponse as NetworkResponse.Error).message)
+  // Verifica que el metodo del repositorio fue llamado.
+  coVerify(exactly = 1) { mockTvShowRepository.getTvShowDetails(seriesIdForErrorTest) }
+
+  // Verifica que la respuesta es de tipo Error y contiene el mensaje correcto.
+  assertTrue(actualResponseValue is NetworkResponse.Error<*>)
+  assertEquals(errorMessage, (actualResponseValue as NetworkResponse.Error<TvShowDetails>).message)
+  assertEquals(expectedResponseFromRepo, actualResponseValue)
  }
 }
+
