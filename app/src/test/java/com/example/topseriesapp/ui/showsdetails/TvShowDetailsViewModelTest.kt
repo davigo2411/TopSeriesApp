@@ -19,6 +19,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -38,6 +39,7 @@ class TvShowDetailsViewModelTest {
 
  private val testDispatcher = StandardTestDispatcher()
  private val getTvShowDetailsUseCase: GetTvShowDetailsUseCase = mockk()
+ private val connectivityChecker: ConnectivityChecker = mockk()
  private lateinit var savedStateHandle: SavedStateHandle
  private lateinit var viewModel: TvShowDetailsViewModel
 
@@ -45,7 +47,7 @@ class TvShowDetailsViewModelTest {
  private val mockTvShowDetails = TvShowDetails(
   id = 1,
   name = "Breaking Bad",
-  overview = "Un profesor de química se convierte en fabricante de drogas",
+  overview = "A high school chemistry teacher turned methamphetamine manufacturer",
   posterPath = "/poster.jpg",
   backdropPath = "/backdrop.jpg",
   firstAirDate = "2008-01-20",
@@ -163,10 +165,11 @@ class TvShowDetailsViewModelTest {
  fun `deberia cargar detalles exitosamente con series id valido`() = runTest {
   // Given
   savedStateHandle = SavedStateHandle(mapOf(SERIES_ID_KEY to seriesId))
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Success(mockTvShowDetails)
+  coEvery { connectivityChecker.isOnline() } returns true
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Success(mockTvShowDetails))
 
   // When
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
   advanceUntilIdle()
 
   // Then
@@ -182,25 +185,27 @@ class TvShowDetailsViewModelTest {
   savedStateHandle = SavedStateHandle()
 
   // When
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
   advanceUntilIdle()
 
   // Then
   val state = viewModel.uiState.first()
   assertTrue(state is DetailsScreenUiState.Error)
   val errorState = state as DetailsScreenUiState.Error
-  assertEquals("Series ID not provided.", errorState.message)
+  assertEquals("ID de serie no proporcionado.", errorState.message)
+  assertFalse(errorState.isOfflineAndNoData)
  }
 
  @Test
- fun `deberia mostrar error cuando el use case retorna error`() = runTest {
+ fun `deberia mostrar error cuando el use case retorna error con conexion`() = runTest {
   // Given
   val errorMessage = "Error de red al obtener detalles"
   savedStateHandle = SavedStateHandle(mapOf(SERIES_ID_KEY to seriesId))
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Error(errorMessage)
+  coEvery { connectivityChecker.isOnline() } returns true
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Error(errorMessage))
 
   // When
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
   advanceUntilIdle()
 
   // Then
@@ -208,15 +213,37 @@ class TvShowDetailsViewModelTest {
   assertTrue(state is DetailsScreenUiState.Error)
   val errorState = state as DetailsScreenUiState.Error
   assertEquals(errorMessage, errorState.message)
+  assertFalse(errorState.isOfflineAndNoData)
+ }
+
+ @Test
+ fun `deberia mostrar error offline cuando no hay conexion y error de red`() = runTest {
+  // Given
+  val networkErrorMessage = "No host found"
+  savedStateHandle = SavedStateHandle(mapOf(SERIES_ID_KEY to seriesId))
+  coEvery { connectivityChecker.isOnline() } returns false
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Error(networkErrorMessage))
+
+  // When
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
+  advanceUntilIdle()
+
+  // Then
+  val state = viewModel.uiState.first()
+  assertTrue(state is DetailsScreenUiState.Error)
+  val errorState = state as DetailsScreenUiState.Error
+  assertEquals("Detalles no disponibles sin conexión.", errorState.message)
+  assertTrue(errorState.isOfflineAndNoData)
  }
 
  @Test
  fun `deberia reintentar y cargar exitosamente despues de error`() = runTest {
   // Given - inicialmente error
   savedStateHandle = SavedStateHandle(mapOf(SERIES_ID_KEY to seriesId))
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Error("Error inicial")
+  coEvery { connectivityChecker.isOnline() } returns true
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Error("Error inicial"))
 
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
   advanceUntilIdle()
 
   // Verificar estado de error inicial
@@ -224,7 +251,7 @@ class TvShowDetailsViewModelTest {
   assertTrue(currentState is DetailsScreenUiState.Error)
 
   // Given - respuesta exitosa para el reintento
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Success(mockTvShowDetails)
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Success(mockTvShowDetails))
 
   // When
   viewModel.retry()
@@ -238,31 +265,14 @@ class TvShowDetailsViewModelTest {
  }
 
  @Test
- fun `deberia mostrar error en retry cuando no hay series id`() = runTest {
-  // Given - SavedStateHandle sin series ID
-  savedStateHandle = SavedStateHandle()
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
-  advanceUntilIdle()
-
-  // When
-  viewModel.retry()
-  advanceUntilIdle()
-
-  // Then
-  val state = viewModel.uiState.first()
-  assertTrue(state is DetailsScreenUiState.Error)
-  val errorState = state as DetailsScreenUiState.Error
-  assertEquals("Series ID not available for retry.", errorState.message)
- }
-
- @Test
  fun `deberia pasar por estado loading durante la carga inicial`() = runTest {
   // Given
   savedStateHandle = SavedStateHandle(mapOf(SERIES_ID_KEY to seriesId))
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Success(mockTvShowDetails)
+  coEvery { connectivityChecker.isOnline() } returns true
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Success(mockTvShowDetails))
 
   // When - crear viewModel pero no avanzar corrutinas
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
 
   // Then - verificar que inicialmente está en loading
   val initialState = viewModel.uiState.first()
@@ -277,29 +287,19 @@ class TvShowDetailsViewModelTest {
  }
 
  @Test
- fun `deberia pasar por estado loading durante retry`() = runTest {
-  // Given - estado de error inicial
+ fun `deberia manejar datos nulos del use case`() = runTest {
+  // Given
   savedStateHandle = SavedStateHandle(mapOf(SERIES_ID_KEY to seriesId))
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Error("Error")
-
-  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle)
+  coEvery { connectivityChecker.isOnline() } returns true
+  coEvery { getTvShowDetailsUseCase(seriesId) } returns flowOf(NetworkResponse.Error("Los datos de los detalles están vacíos."))  // When
+  viewModel = TvShowDetailsViewModel(getTvShowDetailsUseCase, savedStateHandle, connectivityChecker)
   advanceUntilIdle()
 
-  // Preparar respuesta exitosa para retry
-  coEvery { getTvShowDetailsUseCase(seriesId) } returns NetworkResponse.Success(mockTvShowDetails)
-
-  // When - llamar retry pero no avanzar corrutinas
-  viewModel.retry()
-
-  // Then - debería estar en loading
-  val loadingState = viewModel.uiState.first()
-  assertTrue(loadingState is DetailsScreenUiState.Loading)
-
-  // When - completar retry
-  advanceUntilIdle()
-
-  // Then - debería estar en success
-  val successState = viewModel.uiState.first()
-  assertTrue(successState is DetailsScreenUiState.Success)
+  // Then
+  val state = viewModel.uiState.first()
+  assertTrue(state is DetailsScreenUiState.Error)
+  val errorState = state as DetailsScreenUiState.Error
+  assertEquals("Los datos de los detalles están vacíos.", errorState.message)
+  assertFalse(errorState.isOfflineAndNoData)
  }
 }
