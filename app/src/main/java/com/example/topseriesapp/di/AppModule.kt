@@ -63,7 +63,8 @@ val appModule = module {
             apiService = get(),
             popularTvShowDao = get(),
             tvShowDetailsDao = get(),
-            dispatchers = get()
+            dispatchers = get(),
+            applicationContext = androidContext()
         )
     }
 

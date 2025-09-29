@@ -1,5 +1,6 @@
 package com.example.topseriesapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,9 +11,15 @@ import com.example.topseriesapp.ui.MainAppScreen
 import com.example.topseriesapp.ui.MainViewModel
 import com.example.topseriesapp.ui.configuration.ThemeSetting
 import com.example.topseriesapp.ui.theme.TopSeriesAppTheme
+import com.example.topseriesapp.utils.LocaleHelper
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -26,9 +33,12 @@ class MainActivity : ComponentActivity() {
             }
 
             TopSeriesAppTheme(darkTheme = useDarkTheme) {
-                // Llama a MainAppScreen, que contendrá el Scaffold principal y AppNavGraph
-                MainAppScreen(mainViewModel = mainViewModel)
+                MainAppScreen(
+                    mainViewModel = mainViewModel,
+                    onLanguageChanged = { this.recreate() }
+                )
             }
         }
     }
 }
+

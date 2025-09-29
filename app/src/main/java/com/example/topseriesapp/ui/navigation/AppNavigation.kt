@@ -23,7 +23,8 @@ import org.koin.core.parameter.parametersOf
 object AppDestinations {
     const val POPULAR_SHOWS = "popularShows"
     const val CONFIGURATION = "configuration"
-    const val TV_SHOW_DETAILS_ROUTE = "tvShowDetails"
+    const val TV_SHOW_DETAILS_ROUTE = "tvShowDetails" // Ruta base para detalles
+    // Path completo que incluye el argumento seriesId.
     const val TV_SHOW_DETAILS_PATH = "$TV_SHOW_DETAILS_ROUTE/{$SERIES_ID_KEY}"
 }
 
@@ -31,13 +32,12 @@ object AppDestinations {
 fun AppNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    onLanguageChanged: () -> Unit // Parámetro añadido para el callback de cambio de idioma
 ) {
-    val currentThemeSetting by mainViewModel.currentThemeSetting.collectAsStateWithLifecycle()
-
     NavHost(
         navController = navController,
-        startDestination = AppDestinations.POPULAR_SHOWS, // "Home" es la pantalla de shows populares
+        startDestination = AppDestinations.POPULAR_SHOWS,
         modifier = modifier
     ) {
         composable(route = AppDestinations.POPULAR_SHOWS) {
@@ -45,17 +45,20 @@ fun AppNavGraph(
             PopularTvShowsScreen(
                 viewModel = popularTvShowsViewModel,
                 onNavigateToDetails = { seriesId ->
-                    navController.navigate(
-                        AppDestinations.TV_SHOW_DETAILS_ROUTE + "/$seriesId"
-                    )
+                    navController.navigate("${AppDestinations.TV_SHOW_DETAILS_ROUTE}/$seriesId")
                 }
             )
         }
 
         composable(route = AppDestinations.CONFIGURATION) {
+            val currentThemeSetting by mainViewModel.currentThemeSetting.collectAsStateWithLifecycle()
             ConfigurationScreen(
                 currentThemeSetting = currentThemeSetting,
-                onThemeSettingChanged = { newSetting -> mainViewModel.updateThemeSetting(newSetting) }
+                onThemeSettingChanged = { newSetting ->
+                    mainViewModel.updateThemeSetting(newSetting)
+                },
+                onLanguageChanged = onLanguageChanged,
+                modifier = Modifier
             )
         }
 
@@ -64,13 +67,19 @@ fun AppNavGraph(
             arguments = listOf(
                 navArgument(SERIES_ID_KEY) {
                     type = NavType.IntType
+                    // nullable = false
                 }
             )
         ) { backStackEntry ->
+
             val seriesId = backStackEntry.arguments?.getInt(SERIES_ID_KEY)
             if (seriesId != null) {
+                // Inyecta TvShowDetailsViewModel con el seriesId como parámetro usando Koin
                 val detailsViewModel: TvShowDetailsViewModel = koinViewModel { parametersOf(seriesId) }
-                TvShowDetailsScreen(viewModel = detailsViewModel, navController = navController)
+                TvShowDetailsScreen(
+                    viewModel = detailsViewModel,
+                    navController = navController
+                )
             }
         }
     }
