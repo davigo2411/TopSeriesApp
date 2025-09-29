@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">TopSeriesApp</string>
+
+    <!-- Pantalla Popular TV Shows -->
+    <string name="popular_tv_shows">Series de TV Populares</string>
+    <string name="retry">Reintentar</string>
+    <string name="no_popular_shows">No hay series populares para mostrar.</string>
+    <string name="error_prefix">Error: </string>
+    <string name="error_loading_more">Error al cargar más: </string>
+
+    <!-- Pantalla de detalles -->
+    <string name="details">Detalles</string>
+    <string name="back">Volver</string>
+    <string name="synopsis">Sinopsis</string>
+    <string name="creators">Creadores</string>
+    <string name="seasons">Temporadas</string>
+    <string name="not_available">No disponible</string>
+    <string name="no_description">Sin descripción</string>
+    <string name="state">Estado: %1$s</string>
+    <string name="start_date">Inicio: %1$s</string>
+    <string name="seasons_count">Temporadas: %1$d</string>
+    <string name="episodes_count">Episodios: %1$d</string>
+    <string name="votes">(%1$d votos)</string>
+    <string name="genres">Géneros</string>
+    <string name="star">⭐</string>
+
+    <!-- TvShowCard -->
+    <string name="poster_of">Póster de %1$s</string>
+    <string name="na">N/D</string>
+    <string name="rating">Calificación</string>
+    <string name="season_air_date">Emitido: %1$s</string>
+    <string name="bottom_nav_home">Inicio</string>
+
+    <!-- Pantalla de configuración -->
+    <string name="bottom_nav_configuration">Configuración</string>
+    <string name="configuration_title">Configuración</string>
+    <string name="theme_settings_title">Tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_light_description">Seleccionar tema claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_dark_description">Seleccionar tema oscuro</string>
+    <string name="theme_system_default">Predeterminado del sistema</string>
+    <string name="theme_system_default_description">Usar tema predeterminado del sistema</string>
+    <string name="select_theme">Seleccionar Tema</string>
+    <string name="current_theme_is">Tema actual:</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Strings para la selección de idioma -->
+    <string name="language_settings_title">Idioma</string>
+    <string name="select_language">Seleccionar Idioma</string>
+    <string name="language_english">Inglés</string>
+    <string name="language_spanish">Español</string>
+
+</resources>

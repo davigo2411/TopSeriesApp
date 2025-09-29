@@ -1,5 +1,6 @@
 package com.example.topseriesapp.data.repository
 
+import android.content.Context
 import com.example.topseriesapp.BuildConfig
 import com.example.topseriesapp.coroutines.CoroutineDispatchers
 import com.example.topseriesapp.data.database.dao.PopularTvShowDao
@@ -10,6 +11,7 @@ import com.example.topseriesapp.data.model.TvShow
 import com.example.topseriesapp.data.model.TvShowDetails
 import com.example.topseriesapp.data.model.TvShowResponse
 import com.example.topseriesapp.data.network.TMDBApiService
+import com.example.topseriesapp.utils.LocaleHelper
 import com.example.topseriesapp.utils.NetworkResponse
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,7 +21,8 @@ class TvShowRepositoryImpl(
     private val apiService: TMDBApiService,
     private val popularTvShowDao: PopularTvShowDao,
     private val tvShowDetailsDao: TvShowDetailsDao,
-    private val dispatchers: CoroutineDispatchers
+    private val dispatchers: CoroutineDispatchers,
+    private val applicationContext: Context
 ) : TvShowRepository {
 
     private var lastKnownApiTotalPagesForPopular: Int = 0
@@ -164,7 +167,8 @@ class TvShowRepositoryImpl(
         }
 
         try {
-            val apiResponse = apiService.getPopularTvShows(apiKey = BuildConfig.TMDB_API_KEY, page = page)
+            val currentLang = LocaleHelper.getCurrentAppLocale(applicationContext).language
+            val apiResponse = apiService.getPopularTvShows(apiKey = BuildConfig.TMDB_API_KEY, currentLang, page = page)
 
             if (apiResponse.isSuccessful) {
                 apiResponse.body()?.let { responseBody ->
@@ -224,7 +228,8 @@ class TvShowRepositoryImpl(
         }
 
         try {
-            val response = apiService.getTvShowDetails(seriesId = seriesId, apiKey = BuildConfig.TMDB_API_KEY)
+            val currentLang = LocaleHelper.getCurrentAppLocale(applicationContext).language
+            val response = apiService.getTvShowDetails(seriesId = seriesId, apiKey = BuildConfig.TMDB_API_KEY, currentLang)
             if (response.isSuccessful) {
                 response.body()?.let { apiDetails ->
                     tvShowDetailsDao.insertOrUpdateTvShowDetails(apiDetails.toDetailsEntity())

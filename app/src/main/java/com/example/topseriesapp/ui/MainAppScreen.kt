@@ -39,7 +39,10 @@ val bottomNavItemsList = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainAppScreen(mainViewModel: MainViewModel) {
+fun MainAppScreen(
+    mainViewModel: MainViewModel,
+    onLanguageChanged: () -> Unit // Parámetro añadido para el callback de cambio de idioma
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -88,7 +91,8 @@ fun MainAppScreen(mainViewModel: MainViewModel) {
         AppNavGraph(
             navController = navController,
             modifier = Modifier.padding(innerPadding),
-            mainViewModel = mainViewModel
+            mainViewModel = mainViewModel,
+            onLanguageChanged = onLanguageChanged
         )
     }
 }
